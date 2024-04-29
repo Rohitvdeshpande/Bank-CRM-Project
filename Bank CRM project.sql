@@ -77,10 +77,10 @@ rename column bankDOJ1 to bankDOJ;
        
 /* 7.	Segment the customers based on their credit score and identify the segment with the highest exit rate. */
   
-		select CreditScore, count(CustomerId) customer_count from bank_churn
+		select CreditScore, count(CustomerId) as customer_count from bank_churn
 		where exited= 1
 		group by CreditScore
-		order by customer_count desc limit 1;
+		order by customer_count ;
         
 /* 8.	Find out which geographic region has the highest number of 
         active customers with a tenure greater than 5 years. */
@@ -112,7 +112,7 @@ rename column bankDOJ1 to bankDOJ;
 		group by year(bankdoj);
 
                       
-/* 13.	Identify any potential outliers in terms of spend among customers who have remained with the bank.
+/* 13.	Identify any potential outliers in terms of spend among customers who have remained with the bank.*/
 
 		 select * from bank_churn;
 		 select * from customerinfo;
@@ -121,7 +121,7 @@ rename column bankDOJ1 to bankDOJ;
 		     PERCENTILE_CONT(0.75) OVER (ORDER BY (c.estimatedsalary - b.balance)) AS q3
 		 FROM customerinfo c
 		 INNER JOIN bank_churn b ON c.cutomerId = b.customerId;
-*/
+
 /* 15.	Using SQL, write a query to find out the gender-wise average income of males
 		and females in each geography id. Also, rank the gender according to the average value. */
   
@@ -240,8 +240,43 @@ rename column bankDOJ1 to bankDOJ;
 		  ;
           
           
-    SELECT
-    bc.*,
-    (SELECT ExitCategory FROM exitcustomer ec WHERE ec.CustomerID = bc.CustomerID) AS ExitCategory
+/*  22.	As we can see that the “CustomerInfo” table has the CustomerID and Surname, now if we have to join it with a table where the primary key is also a combination of CustomerID and Surname, come up with a column where the format is “CustomerID_Surname”.
+Ans ->*/ 	
+select 
+ ci.CustomerId,
+    		 ci.Surname,
+  		 concat(ci.CustomerId,'_',ci.Surname) as CustomerId_Surname
+  		 from
+    		 customerinfo ci
+     		  join
+    		bank_churn ot on ci.CustomerId = ot.CustomerId;
+
+          
+   /* 23.	Without using “Join”, can we get the “ExitCategory” from ExitCustomers table to Bank_Churn table? If yes do this using SQL.
+Ans ->*/  
+ SELECT
+   	 bc.*,
+    	(SELECT ExitCategory FROM exitcustomer ec WHERE ec.ExitID = bc.Exited) AS ExitCategory
 FROM
-    bank_churn bc;
+    	bank_churn bc;
+
+
+
+
+UPDATE customerinfo c
+INNER JOIN bank_churn bc ON c.CustomerId = bc.CustomerId
+SET bc.IsActiveMember = c.IsActive;
+
+
+
+/*  25.	Write the query to get the customer IDs, their last name, and whether they are active or not for the customers whose surname ends with “on”. */
+SELECT
+    bc.CustomerId,
+    ci.Surname,
+    CASE WHEN bc.IsActiveMember = 1 THEN 'Active' ELSE 'Inactive' END AS ActiveStatus
+FROM
+    bank_churn bc
+JOIN
+    customerinfo ci ON bc.CustomerId = ci.CustomerId
+WHERE
+    ci.Surname LIKE '%on';
