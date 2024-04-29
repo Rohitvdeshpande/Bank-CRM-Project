@@ -112,7 +112,7 @@ rename column bankDOJ1 to bankDOJ;
 		group by year(bankdoj);
 
                       
-/* 13.	Identify any potential outliers in terms of spend among customers who have remained with the bank.*/
+/* 13.	Identify any potential outliers in terms of spend among customers who have remained with the bank.
 
 		 select * from bank_churn;
 		 select * from customerinfo;
@@ -121,7 +121,7 @@ rename column bankDOJ1 to bankDOJ;
 		     PERCENTILE_CONT(0.75) OVER (ORDER BY (c.estimatedsalary - b.balance)) AS q3
 		 FROM customerinfo c
 		 INNER JOIN bank_churn b ON c.cutomerId = b.customerId;
-
+*/
 /* 15.	Using SQL, write a query to find out the gender-wise average income of males
 		and females in each geography id. Also, rank the gender according to the average value. */
   
