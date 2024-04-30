@@ -92,7 +92,7 @@ rename column bankDOJ1 to bankDOJ;
 		inner join activecustomer a ON b.IsActiveMember= a.ActiveID 
 		where b.Tenure>5
 		group by g.GeographyLocation
-		order by count_active_member desc limit 1;
+		order by count_active_member desc limit 3;
         
 /* 10.	For customers who have exited, what is the most common number of products they have used? */
 
@@ -100,7 +100,7 @@ rename column bankDOJ1 to bankDOJ;
         from bank_churn
 		where exited= 1
 		group by NumOfProducts
-		order by total_count desc limit 1;
+		order by total_count desc limit 4;
 
 /* 11.	Examine the trend of customer exits over time and identify 
 		any seasonal patterns (yearly or monthly). Prepare the data through SQL and then visualize it. */
@@ -280,3 +280,23 @@ JOIN
     customerinfo ci ON bc.CustomerId = ci.CustomerId
 WHERE
     ci.Surname LIKE '%on';
+
+/* 7. A modified answer for question no. 7 */
+with cte as(
+	select c.CustomerID, b.Exited, case
+					when  b.CreditScore >= 800 then "Excellent"
+                    when  b.CreditScore between 740 and 799 then "Very Good"
+					when  b.CreditScore between 670 and 739 then "Good"
+					when  b.CreditScore between 580 and 669 then "Fair"
+                    else "Poor"
+				   end as Segment
+	from customerinfo c
+	join bank_churn b
+	on c.CustomerID = b.CustomerID
+)
+select Segment, round(count(case when Exited = 1 then 1 end)/count(*) * 100, 2) as Exit_Rate
+from cte
+group by Segment
+order by count(case when Exited = 1 then 1 end)/count(*) desc;
+
+
